@@ -12,7 +12,7 @@ def writeFile(lib, filename):
         outFile.write(bp.dumps(lib))
 
 if __name__ == '__main__':
-	if len(sys.argv) < 2:
+	if len(sys.argv) != 2:
 		print("Usage: python main.py filename.bib")
 	else:
 		inFile = sys.argv[1]
