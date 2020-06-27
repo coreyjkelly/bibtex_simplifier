@@ -1,30 +1,48 @@
 import sys
 import bibtexparser as bp
 
-def readFile(filename):
-    with open(filename) as bibtex_file:
-        bibtex_str = bibtex_file.read()
-        bib = bp.loads(bibtex_str)
-    return bib
+def read_file(filename):
+	with open(filename, errors='replace') as bibtex_file:
+		bibtex_str = bibtex_file.read()
+		bib = bp.loads(bibtex_str)
+	return bib
 
-def writeFile(lib, filename):
-    with open(filename, 'w') as outFile:
-        outFile.write(bp.dumps(lib))
+def write_file(lib, filename):
+	with open(filename, 'w') as out_file:
+		out_file.write(bp.dumps(lib))
 
 if __name__ == '__main__':
-	if len(sys.argv) != 2:
-		print("Usage: python main.py filename.bib")
+	if len(sys.argv) == 2:
+		in_file = sys.argv[1]
+		out_file = in_file.replace(".bib", "-out.bib")
+	elif len(sys.argv) == 3:
+		in_file = sys.argv[1]
+		out_file = sys.argv[2]
 	else:
-		inFile = sys.argv[1]
-		bib = readFile(inFile)
+		print("Usage: python main.py in_file [out_file]")
+		sys.exit()
 
-		# add/remove fields depending on what you want
-		strip = ['file', 'abstract', 'keyword', 'eprint', 'archiveprefix', 'pmid', 'link', 'issn', 'isbn']
+	bib = read_file(in_file)
 
-		for k, v in bib.entries_dict.items():
-			for kk in strip:
-				if kk in v:
-					v.pop(kk)
+	# add/remove fields depending on what you want
+	strip = ['file', 'abstract', 'keyword', 'keywords', 'eprint', 'archiveprefix', 'pmid', 'link', 'issn', 'isbn', 'mendeley-groups']
+	
+	# replace doi field with note for JBO-style reference processing
+	DO_DOI = True
+
+	for k, v in bib.entries_dict.items():
+	
+		if DO_DOI:
+			if 'doi' in v:
+				old_value = v.pop('doi')
+				new_value = "[doi:%s]" % old_value
+
+				v['note'] = new_value
+
+		for kk in strip:
+			
+			if kk in v:
+				v.pop(kk)
 
 
-		writeFile(bib, inFile.replace(".bib", "-out.bib"))
+	write_file(bib, out_file)
