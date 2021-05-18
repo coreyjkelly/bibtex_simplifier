@@ -2,13 +2,13 @@ import sys
 import bibtexparser as bp
 
 def read_file(filename):
-	with open(filename, errors='replace') as bibtex_file:
+	with open(filename, errors='replace', encoding='UTF-8') as bibtex_file:
 		bibtex_str = bibtex_file.read()
 		bib = bp.loads(bibtex_str)
 	return bib
 
 def write_file(lib, filename):
-	with open(filename, 'w') as out_file:
+	with open(filename, 'w', encoding='UTF-8') as out_file:
 		out_file.write(bp.dumps(lib))
 
 if __name__ == '__main__':
